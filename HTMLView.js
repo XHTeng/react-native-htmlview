@@ -1,16 +1,79 @@
-import React, {Component, PropTypes} from 'react'
-import htmlToElement from './htmlToElement'
-import {
+var React = require('react')
+var ReactNative = require('react-native')
+var htmlToElement = require('./htmlToElement')
+var {
   Linking,
   StyleSheet,
   Text,
-} from 'react-native'
+} = ReactNative
 
-const boldStyle = {fontWeight: '500'}
-const italicStyle = {fontStyle: 'italic'}
-const codeStyle = {fontFamily: 'Menlo'}
 
-const baseStyles = StyleSheet.create({
+var HTMLView = React.createClass({
+  propTypes: {
+    value: React.PropTypes.string,
+    stylesheet: React.PropTypes.object,
+    onLinkPress: React.PropTypes.func,
+    onError: React.PropTypes.func,
+    renderNode: React.PropTypes.func,
+  },
+
+  getDefaultProps() {
+    return {
+      onLinkPress: Linking.openURL,
+      onError: console.error.bind(console),
+    }
+  },
+
+  getInitialState() {
+    return {
+      element: null,
+    }
+  },
+
+  componentWillReceiveProps(nextProps) {
+    if (this.props.value !== nextProps.value) {
+      this.startHtmlRender(nextProps.value)
+    }
+  },
+
+  componentDidMount() {
+    this.mounted = true
+    this.startHtmlRender(this.props.value)
+  },
+
+  componentWillUnmount() {
+    this.mounted = false
+  },
+
+  startHtmlRender(value) {
+    if (!value) return this.setState({element: null})
+
+    var opts = {
+      linkHandler: this.props.onLinkPress,
+      styles: Object.assign({}, baseStyles, this.props.stylesheet),
+      customRenderer: this.props.renderNode,
+    }
+
+    htmlToElement(value, opts, (err, element) => {
+      if (err) return this.props.onError(err)
+
+      if (this.mounted) this.setState({element})
+    })
+  },
+
+  render() {
+    if (this.state.element) {
+      return <Text children={this.state.element} style={{color: '#333333', fontSize:AUTOFONT(50), lineHeight:AUTOH(70) }}/>
+    }
+    return <Text />
+  },
+})
+
+var boldStyle = {fontWeight: '500'}
+var italicStyle = {fontStyle: 'italic'}
+var codeStyle = {fontFamily: 'Menlo'}
+
+var baseStyles = StyleSheet.create({
   b: boldStyle,
   strong: boldStyle,
   i: italicStyle,
@@ -23,70 +86,4 @@ const baseStyles = StyleSheet.create({
   },
 })
 
-class HtmlView extends Component {
-  constructor() {
-    super()
-    this.state = {
-      element: null,
-    }
-  }
-
-  componentDidMount() {
-    this.mounted = true
-    this.startHtmlRender(this.props.value)
-  }
-
-  componentWillReceiveProps(nextProps) {
-    if (this.props.value !== nextProps.value) {
-      this.startHtmlRender(nextProps.value)
-    }
-  }
-
-  componentWillUnmount() {
-    this.mounted = false
-  }
-
-  startHtmlRender(value) {
-    if (!value) {
-      this.setState({element: null})
-    }
-
-    const opts = {
-      linkHandler: this.props.onLinkPress,
-      styles: Object.assign({}, baseStyles, this.props.stylesheet),
-      customRenderer: this.props.renderNode,
-    }
-
-    htmlToElement(value, opts, (err, element) => {
-      if (err) {
-        this.props.onError(err)
-      }
-
-      if (this.mounted) {
-        this.setState({element})
-      }
-    })
-  }
-
-  render() {
-    if (this.state.element) {
-      return <Text children={this.state.element} />
-    }
-    return <Text />
-  }
-}
-
-HtmlView.propTypes = {
-  value: PropTypes.string,
-  stylesheet: PropTypes.object,
-  onLinkPress: PropTypes.func,
-  onError: PropTypes.func,
-  renderNode: PropTypes.func,
-}
-
-HtmlView.defaultProps = {
-  onLinkPress: url => Linking.openURL(url),
-  onError: console.error.bind(console),
-}
-
-export default HtmlView
+module.exports = HTMLView
