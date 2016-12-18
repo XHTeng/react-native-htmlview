@@ -5,7 +5,11 @@ var {
   Linking,
   StyleSheet,
   Text,
+    View,
+    Image
 } = ReactNative
+
+import FitImage from 'react-native-fit-image';
 
 
 var HTMLView = React.createClass({
@@ -63,9 +67,13 @@ var HTMLView = React.createClass({
 
   render() {
     if (this.state.element) {
-      return <Text children={this.state.element} style={{color: '#333333', fontSize:AUTOFONT(50), lineHeight:AUTOH(70) }}/>
+      return <View>
+        {this.state.element}
+      </View>
     }
-    return <Text />
+    return <View>
+
+    </View>
   },
 })
 
