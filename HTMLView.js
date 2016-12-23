@@ -2,15 +2,14 @@ var React = require('react')
 var ReactNative = require('react-native')
 var htmlToElement = require('./htmlToElement')
 var {
-  Linking,
-  StyleSheet,
-  Text,
+    Linking,
+    StyleSheet,
+    Text,
     View,
     Image
 } = ReactNative
 
 import FitImage from 'react-native-fit-image';
-
 
 var HTMLView = React.createClass({
   propTypes: {
@@ -77,7 +76,7 @@ var HTMLView = React.createClass({
   },
 })
 
-var boldStyle = {fontWeight: '500'}
+var boldStyle = {fontWeight: '500',fontSize:AUTOFONT(50),lineHeight: parseInt(AUTOW(75))}
 var italicStyle = {fontStyle: 'italic'}
 var codeStyle = {fontFamily: 'Menlo'}
 
@@ -89,8 +88,9 @@ var baseStyles = StyleSheet.create({
   pre: codeStyle,
   code: codeStyle,
   a: {
-    fontWeight: '500',
-    color: '#007AFF',
+    color: '#333333',
+    fontSize:AUTOFONT(50),
+    lineHeight: parseInt(AUTOW(75))
   },
 })
 
