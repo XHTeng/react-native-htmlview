@@ -8,9 +8,9 @@ var {
 } = ReactNative
 
 
-var LINE_BREAK = '\n'
-var PARAGRAPH_BREAK = '\n\n'
-var BULLET = '\u2022 '
+var LINE_BREAK = ''
+var PARAGRAPH_BREAK = ''
+var BULLET = ''
 
 function htmlToElement(rawHtml, opts, done) {
   function domToElement(dom, parent) {
@@ -24,7 +24,7 @@ function htmlToElement(rawHtml, opts, done) {
 
       if (node.type == 'text') {
         return (
-          <Text key={index} style={parent ? opts.styles[parent.name] : null}>
+          <Text key={index} style={[{fontSize:AUTOFONT(50),lineHeight: parseInt(AUTOW(75)),color: '#333333'},parent ? opts.styles[parent.name] : null]}>
             {entities.decodeHTML(node.data)}
           </Text>
         )
@@ -37,7 +37,7 @@ function htmlToElement(rawHtml, opts, done) {
         }
 
         return (
-          <Text key={index} onPress={linkPressHandler}>
+          <Text key={index} style={{fontSize:AUTOFONT(50),lineHeight: parseInt(AUTOW(75))}} onPress={linkPressHandler}>
             {node.name == 'pre' ? LINE_BREAK : null}
             {node.name == 'li' ? BULLET : null}
             {domToElement(node.children, node)}
