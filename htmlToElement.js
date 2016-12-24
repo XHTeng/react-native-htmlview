@@ -24,7 +24,7 @@ function htmlToElement(rawHtml, opts, done) {
 
       if (node.type == 'text') {
         return (
-          <Text key={index} style={[{fontSize:AUTOFONT(50),lineHeight: parseInt(AUTOW(75)),color: '#333333'},parent ? opts.styles[parent.name] : null]}>
+          <Text key={index} style={[{fontSize:AUTOFONT(50),lineHeight: parseInt(AUTOW(75))},parent ? opts.styles[parent.name] : null]}>
             {entities.decodeHTML(node.data)}
           </Text>
         )
@@ -34,6 +34,31 @@ function htmlToElement(rawHtml, opts, done) {
         var linkPressHandler = null
         if (node.name == 'a' && node.attribs && node.attribs.href) {
           linkPressHandler = () => opts.linkHandler(entities.decodeHTML(node.attribs.href))
+        }
+
+        if (node.name == 'strong') {
+          return (
+              <Text key={index} style={{fontSize:AUTOFONT(50),fontWeight: '500',lineHeight: parseInt(AUTOW(75))}} onPress={linkPressHandler}>
+
+                {domToElement(node.children, node)}
+
+              </Text>
+          )
+        }
+
+        if (node.name == 'span') {
+          console.log('span',node.attribs.style);
+          if (node.attribs.style) {
+            if (node.attribs.style.indexOf('color:#') == 0) {
+              let local = node.attribs.style.indexOf('#');
+              let colorStr = node.attribs.style.slice(local,local+7);
+              return (
+                  <Text key={index} style={{fontSize:AUTOFONT(50),lineHeight: parseInt(AUTOW(75)),color:colorStr}} onPress={linkPressHandler}>
+                    {domToElement(node.children, node)}
+                  </Text>
+              )
+            }
+          }
         }
 
         return (
