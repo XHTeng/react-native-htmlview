@@ -57,7 +57,7 @@ var HTMLView = React.createClass({
       customRenderer: this.props.renderNode,
     }
 
-    htmlToElement(value, opts, (err, element) => {
+    htmlToElement(this.props.isShowArticle,value, opts, (err, element) => {
       if (err) return this.props.onError(err)
 
       if (this.mounted) this.setState({element})
