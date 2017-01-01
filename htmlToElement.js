@@ -2,6 +2,7 @@ var React = require('react')
 var ReactNative = require('react-native')
 var htmlparser = require('./vendor/htmlparser2')
 var entities = require('./vendor/entities')
+import {Image, View} from 'react-native';
 
 var {
   Text,
@@ -10,9 +11,9 @@ var {
 
 var LINE_BREAK = ''
 var PARAGRAPH_BREAK = ''
-var BULLET = ''
+var BULLET = '\u2022'
 
-function htmlToElement(rawHtml, opts, done) {
+function htmlToElement(isShowArticle,rawHtml, opts, done) {
   function domToElement(dom, parent) {
     if (!dom) return null
 
@@ -30,20 +31,31 @@ function htmlToElement(rawHtml, opts, done) {
         )
       }
 
+      console.log('里面节点',node);
+
       if (node.type == 'tag') {
-        var linkPressHandler = null
-        if (node.name == 'a' && node.attribs && node.attribs.href) {
-          linkPressHandler = () => opts.linkHandler(entities.decodeHTML(node.attribs.href))
-        }
+        // var linkPressHandler = null
+        // if (node.name == 'a' && node.attribs && node.attribs.href) {
+        //   linkPressHandler = () => opts.linkHandler(entities.decodeHTML(node.attribs.href))
+        // }
 
         if (node.name == 'strong') {
           return (
-              <Text key={index} style={{fontSize:AUTOFONT(50),fontWeight: '500',lineHeight: parseInt(AUTOW(75))}} onPress={linkPressHandler}>
+              <Text key={index} style={{fontSize:AUTOFONT(50),fontWeight: '500',lineHeight: parseInt(AUTOW(75))}}>
 
                 {domToElement(node.children, node)}
 
               </Text>
           )
+        }
+
+        if (isShowArticle) {
+          if (node.name == 'img') {
+            return (
+                <Image source={{uri:node.attribs.src + THUMBNAIL_URL_SHOW_DETAIL}} style={{height:SCREEN_WIDTH - AUTOW(60),width:SCREEN_WIDTH - AUTOW(60)}}>
+                </Image>
+            )
+          }
         }
 
         if (node.name == 'span') {
@@ -53,7 +65,7 @@ function htmlToElement(rawHtml, opts, done) {
               let local = node.attribs.style.indexOf('#');
               let colorStr = node.attribs.style.slice(local,local+7);
               return (
-                  <Text key={index} style={{fontSize:AUTOFONT(50),lineHeight: parseInt(AUTOW(75)),color:colorStr}} onPress={linkPressHandler}>
+                  <Text key={index} style={{fontSize:AUTOFONT(50),lineHeight: parseInt(AUTOW(75)),color:colorStr}}>
                     {domToElement(node.children, node)}
                   </Text>
               )
@@ -62,7 +74,7 @@ function htmlToElement(rawHtml, opts, done) {
         }
 
         return (
-          <Text key={index} style={{fontSize:AUTOFONT(50),lineHeight: parseInt(AUTOW(75))}} onPress={linkPressHandler}>
+          <Text key={index} style={{fontSize:AUTOFONT(50),lineHeight: parseInt(AUTOW(75))}}>
             {node.name == 'pre' ? LINE_BREAK : null}
             {node.name == 'li' ? BULLET : null}
             {domToElement(node.children, node)}
