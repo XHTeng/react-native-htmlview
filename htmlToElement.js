@@ -31,13 +31,20 @@ function htmlToElement(isShowArticle,rawHtml, opts, done) {
         )
       }
 
-      console.log('里面节点',node);
-
       if (node.type == 'tag') {
-        // var linkPressHandler = null
-        // if (node.name == 'a' && node.attribs && node.attribs.href) {
-        //   linkPressHandler = () => opts.linkHandler(entities.decodeHTML(node.attribs.href))
-        // }
+        
+        if (node.name == 'b') {
+          for (let i=0;i<node.children.length;i++) {
+            if ((node.children[i].type == 'tag') && (node.children[i].name == 'a')) {
+              let childrenData = node.children[i];
+              for (let j=0;j<childrenData.children.length;j++) {
+                if ((childrenData.children[j].type == 'tag') && (childrenData.children[j].name == 'img')) {
+                  node = childrenData.children[j];
+                }
+              }
+            }
+          }
+        }
 
         if (node.name == 'strong') {
           return (
